@@ -34,8 +34,6 @@ public interface ParameterDao {
             "illumination = #{illumination},windSpeed = #{windSpeed},windDirection = #{windDirection} where id = #{id}" })
     Integer update(Parameter parameter);
 
-
-
     @Select("SELECT "
             + "a.id as 'id',a.create_date as 'createDate',a.content as 'content',"
             + "a.parent_id as 'parentId',a.first_comment_id as 'firstCommentId',"
