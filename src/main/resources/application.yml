@@ -6,3 +6,8 @@ spring:
     url: jdbc:mysql://118.31.250.119:3306/environment-protection?useSSL=false
     username: root
     password: root
+
+logging:
+  level:
+   #打印SQL信息
+   com.environment.program.dao: debug
