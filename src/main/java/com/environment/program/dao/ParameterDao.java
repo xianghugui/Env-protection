@@ -7,6 +7,19 @@ import java.util.List;
 
 @Mapper
 public interface ParameterDao {
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "temperature", column = "temperature"),
+            @Result(property = "humidity", column = "humidity"),
+            @Result(property = "hcho", column = "HCHO"),
+            @Result(property = "tvoc", column = "TVOC"),
+            @Result(property = "coTwo", column = "CO_two"),
+            @Result(property = "pMTwoPointFive", column = "PM_two_point_five"),
+            @Result(property = "pMOnePointZero", column = "PM_one_point_zero"),
+            @Result(property = "illumination", column = "illumination"),
+            @Result(property = "windSpeed", column = "windSpeed"),
+            @Result(property = "windDirection", column = "windDirection")
+    })
 
     @Insert("INSERT INTO parameter" +
             "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five, PM_one_point_zero,illumination,windSpeed,windDirection)" +
@@ -22,12 +35,7 @@ public interface ParameterDao {
     Integer update(Parameter parameter);
 
 
-    @Results({
-            @Result(property = "userId", column = "USER_ID"),
-            @Result(property = "username", column = "USERNAME"),
-            @Result(property = "password", column = "PASSWORD"),
-            @Result(property = "mobileNum", column = "PHONE_NUM")
-    })
+
     @Select("SELECT "
             + "a.id as 'id',a.create_date as 'createDate',a.content as 'content',"
             + "a.parent_id as 'parentId',a.first_comment_id as 'firstCommentId',"
@@ -39,6 +47,6 @@ public interface ParameterDao {
             + "WHERE a.demand_id = #{demandId} "
             + "ORDER BY a.create_date ASC"
             + "LIMIT #{startNo},#{pageSize}")
-    public List<Parameter> select (@Param("demandId") Long demandId, @Param("startNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+    List<Parameter> select (@Param("demandId") Long demandId, @Param("startNo") Integer pageNo, @Param("pageSize") Integer pageSize);
 
 }
