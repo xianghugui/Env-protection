@@ -20,4 +20,10 @@ public class ParameterServiceImpl implements ParameterService {
     public Integer insert(Parameter parameter) {
         return parameterDao.insert(parameter);
     }
+
+    @Override
+    @Transactional
+    public Integer update(Parameter parameter) {
+        return parameterDao.update(parameter);
+    }
 }
