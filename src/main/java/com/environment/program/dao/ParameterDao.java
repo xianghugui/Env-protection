@@ -18,20 +18,22 @@ public interface ParameterDao {
             @Result(property = "pMOnePointZero", column = "PM_one_point_zero"),
             @Result(property = "illumination", column = "illumination"),
             @Result(property = "windSpeed", column = "windSpeed"),
+            @Result(property = "deviceId", column = "deviceId"),
+            @Result(property = "createTime", column = "createTime"),
             @Result(property = "windDirection", column = "windDirection")
     })
 
     @Insert("INSERT INTO parameter" +
-            "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five, PM_one_point_zero,illumination,windSpeed,windDirection)" +
+            "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five, PM_one_point_zero,illumination,windSpeed,windDirection,deviceId,createTime)" +
             " values" +
-            " (#{temperature},#{humidity},#{hcho},#{tvoc},#{coTwo},#{pMTwoPointFive}, #{pMOnePointZero},#{illumination},#{windSpeed},#{windDirection})")
+            " (#{temperature},#{humidity},#{hcho},#{tvoc},#{coTwo},#{pMTwoPointFive}, #{pMOnePointZero},#{illumination},#{windSpeed},#{windDirection},#{deviceId},#{createTime})")
     @Options(useGeneratedKeys = true, keyColumn = "id")
     Integer insert(Parameter parameter);
 
     @Update({ "UPDATE parameter SET " +
             "temperature = #{temperature},humidity = #{humidity},HCHO = #{hcho},TVOC = #{tvoc} ," +
             "CO_two = #{coTwo},PM_two_point_five = #{pMTwoPointFive},PM_one_point_zero = #{pMOnePointZero}, " +
-            "illumination = #{illumination},windSpeed = #{windSpeed},windDirection = #{windDirection} where id = #{id}" })
+            "illumination = #{illumination},windSpeed = #{windSpeed},windDirection = #{windDirection},deviceId = #{deviceId} where id = #{id}" })
     Integer update(Parameter parameter);
 
     @Select("SELECT "

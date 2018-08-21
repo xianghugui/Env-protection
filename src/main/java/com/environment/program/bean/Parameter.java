@@ -1,5 +1,7 @@
 package com.environment.program.bean;
 
+import java.util.Date;
+
 public class Parameter {
 
     private Integer id;
@@ -23,6 +25,26 @@ public class Parameter {
     private String windSpeed;
     //风向
     private String windDirection;
+    //风向
+    private String deviceId;
+    //创建时间
+    private Date createTime;
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public Integer getId() {
         return id;
@@ -120,12 +142,14 @@ public class Parameter {
                 ", humidity='" + humidity + '\'' +
                 ", hcho='" + hcho + '\'' +
                 ", tvoc='" + tvoc + '\'' +
-                ", coTwo=" + coTwo +
+                ", coTwo='" + coTwo + '\'' +
                 ", pMTwoPointFive='" + pMTwoPointFive + '\'' +
                 ", pMOnePointZero='" + pMOnePointZero + '\'' +
                 ", illumination='" + illumination + '\'' +
                 ", windSpeed='" + windSpeed + '\'' +
                 ", windDirection='" + windDirection + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", createTime=" + createTime +
                 '}';
     }
 }
