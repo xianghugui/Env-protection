@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50721
 File Encoding         : 65001
 
-Date: 2018-08-20 16:06:51
+Date: 2018-08-21 09:13:36
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -31,5 +31,7 @@ CREATE TABLE `parameter` (
   `illumination` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '光照',
   `windSpeed` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '风速',
   `windDirection` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '风向',
+  `deviceId` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
