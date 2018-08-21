@@ -3,9 +3,14 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://118.31.250.119:3306/environment-protection?useSSL=false
+    url: jdbc:mysql://118.31.250.119:3306/environment-protection?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false&autoReconnect=true
     username: root
     password: root
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.environment.program.bean
 
 logging:
   level:
