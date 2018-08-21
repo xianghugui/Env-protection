@@ -15,19 +15,32 @@ public class ParameterController {
     @Resource
     private ParameterService parameterService;
 
-
+    /**
+     * insert data
+     * @param parameter
+     * @return
+     */
     @PostMapping("/insert")
     public ResponseMessage insert(@RequestBody Parameter parameter) {
         return ResponseMessage.ok(parameterService.insert(parameter));
     }
 
     /**
-     * 更新表数据
+     * update data
      * @param parameter
      * @return
      */
     @PutMapping("/update")
     public ResponseMessage update(@RequestBody Parameter parameter) {
         return ResponseMessage.ok(parameterService.update(parameter));
+    }
+
+    /**
+     * get one data according to data insert database time desc
+     * @return
+     */
+    @GetMapping ("/selectOne")
+    public ResponseMessage selectOne() {
+        return ResponseMessage.ok(parameterService.selectOne());
     }
 }

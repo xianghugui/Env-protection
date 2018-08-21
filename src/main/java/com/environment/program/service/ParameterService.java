@@ -7,4 +7,6 @@ public interface ParameterService {
     Integer insert(Parameter parameter);
 
     Integer update(Parameter parameter);
+
+    Parameter selectOne ();
 }

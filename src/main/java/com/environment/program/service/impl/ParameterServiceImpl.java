@@ -29,4 +29,9 @@ public class ParameterServiceImpl implements ParameterService {
     public Integer update(Parameter parameter) {
         return parameterDao.update(parameter);
     }
+
+    @Override
+    public Parameter selectOne() {
+        return parameterDao.selectOne();
+    }
 }
