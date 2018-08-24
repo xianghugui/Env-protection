@@ -5,18 +5,18 @@
 <mapper namespace="com.environment.program.dao.ParameterMapper">
     <resultMap id="ParameterResultMap" type="com.environment.program.bean.Parameter">
         <id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
-        <result property="temperature" column="temperature" javaType="String" jdbcType="VARCHAR"/>
-        <result property="humidity" column="humidity" javaType="String" jdbcType="VARCHAR"/>
-        <result property="hcho" column="HCHO" javaType="String" jdbcType="VARCHAR"/>
-        <result property="tvoc" column="TVOC" javaType="String" jdbcType="VARCHAR"/>
+        <result property="temperature" column="temperature" javaType="String" jdbcType="VARCHAR" />
+        <result property="humidity" column="humidity" javaType="String" jdbcType="VARCHAR" />
+        <result property="hcho" column="HCHO" javaType="String" jdbcType="VARCHAR" />
+        <result property="tvoc" column="TVOC" javaType="String" jdbcType="VARCHAR" />
         <result property="coTwo" column="CO_two" javaType="String" jdbcType="VARCHAR"/>
-        <result property="pMTwoPointFive" column="PM_two_point_five" javaType="String" jdbcType="VARCHAR"/>
-        <result property="pMOnePointZero" column="PM_one_point_zero" javaType="String" jdbcType="VARCHAR"/>
-        <result property="illumination" column="illumination" javaType="String" jdbcType="VARCHAR"/>
-        <result property="windSpeed" column="windSpeed" javaType="String" jdbcType="VARCHAR"/>
-        <result property="deviceId" column="deviceId" javaType="String" jdbcType="VARCHAR"/>
-        <result property="windDirection" column="windDirection" javaType="String" jdbcType="VARCHAR"/>
-        <result property="createTime" column="createTime" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        <result property="pMTwoPointFive" column="PM_two_point_five" javaType="String" jdbcType="VARCHAR" />
+        <result property="pMOnePointZero" column="PM_one_point_zero" javaType="String" jdbcType="VARCHAR" />
+        <result property="illumination" column="illumination" javaType="String" jdbcType="VARCHAR" />
+        <result property="windSpeed" column="windSpeed" javaType="String" jdbcType="VARCHAR" />
+        <result property="deviceId" column="deviceId" javaType="String" jdbcType="VARCHAR" />
+        <result property="windDirection" column="windDirection" javaType="String" jdbcType="VARCHAR" />
+        <result property="createTime" column="createTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
     </resultMap>
     <!--<select id="selectOne"  resultMap="ParameterResultMap">-->
         <!--SELECT * FROM parameter ORDER BY createTime DESC LIMIT 1-->

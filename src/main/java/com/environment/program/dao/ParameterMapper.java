@@ -38,5 +38,4 @@ public interface ParameterMapper {
 
     @Select("SELECT * FROM parameter ORDER BY createTime DESC LIMIT 1")
     Parameter selectOne ();
-
 }

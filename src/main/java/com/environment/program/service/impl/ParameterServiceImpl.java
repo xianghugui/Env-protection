@@ -33,5 +33,7 @@ public class ParameterServiceImpl implements ParameterService {
     @Override
     public Parameter selectOne() {
         return parameterMapper.selectOne();
+
+
     }
 }

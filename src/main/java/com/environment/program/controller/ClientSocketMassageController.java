@@ -19,6 +19,7 @@ public class ClientSocketMassageController {
     public ClientMassageParameter sendMessage(@Payload ClientMassageParameter chatMessage) {
         System.out.println(chatMessage.getContent());
         //解析客户端发送给服务端的数据
+
         //服务端再返回响应结果
         return chatMessage;
     }
