@@ -37,6 +37,7 @@
         <!-- Enables automatic mapping from classic database column names A_COLUMN to camel case classic Java property names aColumn. -->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
 
+
         <!-- MyBatis uses local cache to prevent circular references and speed up repeated nested queries. By default (SESSION) all queries executed during a session are cached. If localCacheScope=STATEMENT
             local session will be used just for statement execution, no data will be shared between two different calls to the same SqlSession. -->
         <setting name="localCacheScope" value="SESSION"/>
