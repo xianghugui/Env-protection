@@ -25,17 +25,12 @@
         <!-- 给予被嵌套的resultMap以字段-属性的映射支持 FULL,PARTIAL -->
         <setting name="autoMappingBehavior" value="PARTIAL"/>
 
-        <!-- 对于批量更新操作缓存SQL以提高性能 BATCH,SIMPLE -->
-        <!-- <setting name="defaultExecutorType" value="BATCH" /> -->
-
-        <!-- 数据库超过25000秒仍未响应则超时 -->
-        <!-- <setting name="defaultStatementTimeout" value="25000" /> -->
-
         <!-- Allows using RowBounds on nested statements -->
         <setting name="safeRowBoundsEnabled" value="false"/>
 
         <!-- Enables automatic mapping from classic database column names A_COLUMN to camel case classic Java property names aColumn. -->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
+
 
         <!-- MyBatis uses local cache to prevent circular references and speed up repeated nested queries. By default (SESSION) all queries executed during a session are cached. If localCacheScope=STATEMENT
             local session will be used just for statement execution, no data will be shared between two different calls to the same SqlSession. -->
