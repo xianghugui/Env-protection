@@ -16,6 +16,7 @@ public interface ParameterMapper {
             @Result(property = "coTwo", column = "CO_two"),
             @Result(property = "pMTwoPointFive", column = "PM_two_point_five"),
             @Result(property = "pMOnePointZero", column = "PM_one_point_zero"),
+            @Result(property = "pMTen", column = "PM_ten"),
             @Result(property = "illumination", column = "illumination"),
             @Result(property = "windSpeed", column = "windSpeed"),
             @Result(property = "deviceId", column = "deviceId"),
@@ -24,15 +25,15 @@ public interface ParameterMapper {
     })
 
     @Insert("INSERT INTO parameter" +
-            "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five, PM_one_point_zero,illumination,windSpeed,windDirection,deviceId,createTime)" +
+            "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five, PM_one_point_zero, PM_ten, illumination,windSpeed,windDirection,deviceId,createTime)" +
             " values" +
-            " (#{temperature},#{humidity},#{hcho},#{tvoc},#{coTwo},#{pMTwoPointFive}, #{pMOnePointZero},#{illumination},#{windSpeed},#{windDirection},#{deviceId},#{createTime})")
+            " (#{temperature},#{humidity},#{hcho},#{tvoc},#{coTwo},#{pMTwoPointFive}, #{pMOnePointZero}, #{pMTen}, #{illumination},#{windSpeed},#{windDirection},#{deviceId},#{createTime})")
     @Options(useGeneratedKeys = true, keyColumn = "id")
     Integer insert(Parameter parameter);
 
     @Update({ "UPDATE parameter SET " +
             "temperature = #{temperature},humidity = #{humidity},HCHO = #{hcho},TVOC = #{tvoc} ," +
-            "CO_two = #{coTwo},PM_two_point_five = #{pMTwoPointFive},PM_one_point_zero = #{pMOnePointZero}, " +
+            "CO_two = #{coTwo},PM_two_point_five = #{pMTwoPointFive},PM_one_point_zero = #{pMOnePointZero}, PM_ten = #{pMTen}, " +
             "illumination = #{illumination},windSpeed = #{windSpeed},windDirection = #{windDirection},deviceId = #{deviceId} where id = #{id}" })
     Integer update(Parameter parameter);
 

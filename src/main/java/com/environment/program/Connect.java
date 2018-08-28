@@ -1,10 +1,10 @@
 package com.environment.program;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 
 public class Connect {
@@ -24,10 +24,11 @@ public class Connect {
     private static Thread tRecv = new Thread(new RecvThread());
     private static Thread tKeep = new Thread(new KeepThread());
 
-    public static void connect() throws UnknownHostException, IOException  {
+    public static void connect() throws IOException  {
         client = threadConnect.get();
         if(client == null){
             client = new Socket(HOST, PORT);
+            client.setKeepAlive(true);
             threadConnect.set(client);
             tKeep.start();
             System.out.println("========链接开始！========");
@@ -75,7 +76,7 @@ public class Connect {
                     byte[] b = new byte[1024];
                     int r = inStr.read(b);
                     if(r>-1){
-                        String str = new String(b);
+                        String str = new String(b, 0 , r);
                         System.out.println( str );
                     }
                 }
@@ -98,4 +99,5 @@ public class Connect {
 //            e.printStackTrace();
 //        }
 //    }
+
 }

@@ -23,13 +23,15 @@ public class Parameter {
     private String pMTwoPointFive;
     // PM1.0
     private String pMOnePointZero;
+    // PM10
+    private String pMTen;
     //光照
     private String illumination;
     //风速
     private String windSpeed;
     //风向
     private String windDirection;
-    //风向
+
     private String deviceId;
     //创建时间
     @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss")
@@ -139,6 +141,14 @@ public class Parameter {
         this.windDirection = windDirection;
     }
 
+    public String getpMTen() {
+        return pMTen;
+    }
+
+    public void setpMTen(String pMTen) {
+        this.pMTen = pMTen;
+    }
+
     @Override
     public String toString() {
         return "Parameter{" +
@@ -150,6 +160,7 @@ public class Parameter {
                 ", coTwo='" + coTwo + '\'' +
                 ", pMTwoPointFive='" + pMTwoPointFive + '\'' +
                 ", pMOnePointZero='" + pMOnePointZero + '\'' +
+                ", pMTen='" + pMTen + '\'' +
                 ", illumination='" + illumination + '\'' +
                 ", windSpeed='" + windSpeed + '\'' +
                 ", windDirection='" + windDirection + '\'' +
