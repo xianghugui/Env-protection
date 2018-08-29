@@ -37,6 +37,6 @@ public interface ParameterMapper {
             "illumination = #{illumination},windSpeed = #{windSpeed},windDirection = #{windDirection},deviceId = #{deviceId} where id = #{id}" })
     Integer update(Parameter parameter);
 
-    @Select("SELECT * FROM parameter ORDER BY createTime DESC LIMIT 1")
+    @Select("SELECT * FROM parameter WHERE deviceId = 'ZXW-0002' ORDER BY createTime DESC LIMIT 1")
     Parameter selectOne ();
 }
