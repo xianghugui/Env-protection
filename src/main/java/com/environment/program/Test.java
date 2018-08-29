@@ -24,17 +24,17 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        new connect(parameterService);
+        new Connect(parameterService);
     }
 
     /**
      * 开启Socket
      */
-    private static class connect implements Runnable {
+    private static class Connect implements Runnable {
 
         private ParameterService parameterService;
 
-        public connect(ParameterService parameterService) {
+        public Connect(ParameterService parameterService) {
             this.parameterService = parameterService;
             new Thread(this).start();
         }
@@ -83,6 +83,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                     while (true) {
                         byte[] b = new byte[118];
                         int r = inStr.read(b);
+                        System.out.println(new String(b, "UTF-8"));
                         String device = new String(b, 2, 8, "UTF-8");
                         if (r > 58) {
                             Parameter parameter = new Parameter();
@@ -99,32 +100,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                             parameter.setpMTwoPointFive(String.valueOf(change(b[53], b[54])));
                             parameter.setpMTen(String.valueOf(change(b[55], b[56])));
                             parameter.setCreateTime(new java.util.Date());
-                            System.out.println(parameter);
-//                        Connection con = DBUtil.getConnection();
-//                        String sql = "INSERT INTO parameter" +
-//                                "(temperature,humidity,HCHO,TVOC,CO_two,PM_two_point_five," +
-//                                " PM_one_point_zero, PM_ten, illumination,windSpeed,windDirection," +
-//                                "deviceId,createTime)" +
-//                                " values" +
-//                                " (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-//
-//                        PreparedStatement psmt = con.prepareStatement(sql);
-//                        psmt.setString(1, parameter.getTemperature());
-//                        psmt.setString(2, parameter.getHumidity());
-//                        psmt.setString(3, parameter.getHcho());
-//                        psmt.setString(4, parameter.getTvoc());
-//                        psmt.setString(5, parameter.getCoTwo());
-//                        psmt.setString(6, parameter.getpMTwoPointFive());
-//                        psmt.setString(7, parameter.getpMOnePointZero());
-//                        psmt.setString(8, parameter.getpMTen());
-//                        psmt.setString(9, parameter.getIllumination());
-//                        psmt.setString(10, parameter.getWindSpeed());
-//                        psmt.setString(11, parameter.getWindDirection());
-//                        psmt.setString(12, parameter.getDeviceId());
-//                        psmt.setTimestamp(13, new Timestamp(parameter.getCreateTime().getTime()));
-//                        //执行SQL语句
-//                        psmt.execute();
-                            System.out.println(parameterService.insert(parameter));
+                            parameterService.insert(parameter);
                         }
                     }
                 } catch (IOException e) {

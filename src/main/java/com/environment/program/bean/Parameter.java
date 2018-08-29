@@ -1,8 +1,6 @@
 package com.environment.program.bean;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -34,7 +32,7 @@ public class Parameter {
 
     private String deviceId;
     //创建时间
-    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date createTime;
 
     public String getDeviceId() {
