@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,12 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
      */
     private static byte[] RESPONSE_PACKAGE = {(byte)0x55, (byte)0xAA , (byte)0x08, (byte)0x00, (byte)0x00, (byte)0x00};
 
+    /**
+     * 线程池
+     */
+    private static final ExecutorService THREAD_POOL = new ThreadPoolExecutor(10, 10,
+            1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(10));
+
     @Autowired
     private ParameterService parameterService;
 
@@ -38,7 +45,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        new Connect(parameterService);
+        THREAD_POOL.execute(new Connect(parameterService));
     }
 
     /**
@@ -50,7 +57,6 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
 
         public Connect(ParameterService parameterService) {
             this.parameterService = parameterService;
-            new Thread(this).start();
         }
 
         @Override
@@ -61,7 +67,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                 while (true) {
                     Socket client = serverSocket.accept();
                     System.out.println("------已连接------");
-                    new RecvThread(client, parameterService);
+                    THREAD_POOL.execute(new RecvThread(client, parameterService));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,7 +78,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
         /**
          * 接受消息
          */
-        static class RecvThread implements Runnable {
+         static class RecvThread implements Runnable {
 
             private Socket socket;
 
@@ -81,7 +87,6 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
             public RecvThread(Socket client, ParameterService parameterService) {
                 socket = client;
                 this.parameterService = parameterService;
-                new Thread(this).start();
             }
 
             /**
@@ -121,7 +126,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                             outStr.write(RESPONSE_PACKAGE);
                             outStr.flush();
                         } else if (r == 59) {
-                            Matcher m = DEVICE_PATTERN.matcher(new String(b));
+                            Matcher m = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
                             if (m.find()) {
 //                                System.out.println("设备:" + new String(b, m.start(), 8) + "  " + new Date());
 //                                System.out.println("风速:" + String.valueOf(change(b[36], b[37]) * 1.0 / 10) + "，原始数据:" + (b[36] & 0xFF) + "  " + (b[37] & 0xFF));
@@ -136,7 +141,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
 //                                System.out.println("PM2.5:" + String.valueOf(change(b[53], b[54])) + "，原始数据:" + (b[53] & 0xFF) + "  " + (b[54] & 0xFF));
 //                                System.out.println("PM10:" + String.valueOf(change(b[55], b[56])) + "，原始数据:" + (b[55] & 0xFF) + "  " + (b[56] & 0xFF));
                                 Parameter parameter = new Parameter();
-                                parameter.setDeviceId(new String(b, m.start(), 8));
+                                parameter.setDeviceId(new String(b, m.start(), 8, "UTF-8"));
                                 parameter.setWindSpeed(result(change(b[36], b[37])));
                                 parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
                                 parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
