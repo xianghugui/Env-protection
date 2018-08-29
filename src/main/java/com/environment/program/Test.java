@@ -94,8 +94,13 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
              * @return
              */
             private String result(int value){
-                return String.valueOf(value == 0 ? 0 : value * 1.0 / 10);
+                if(value == 0){
+                    return String.valueOf(value);
+                }else{
+                    return String.valueOf(value * 1.0 / 10);
+                }
             }
+
 
             @Override
             public void run() {
