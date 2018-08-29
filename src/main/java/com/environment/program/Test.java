@@ -19,14 +19,21 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final int PORT = 8888;
 
+    /**
+     * 匹配设备ID，格式为ABC-1234
+     */
     private static Pattern DEVICE_PATTERN = Pattern.compile("[a-zA-Z]{3}[-]{1}\\d{4}");
+
+    /**
+     * 心跳应答包
+     */
+    private static byte[] RESPONSE_PACKAGE = {(byte)0x55, (byte)0xAA , (byte)0x08, (byte)0x00, (byte)0x00, (byte)0x00};
 
     @Autowired
     private ParameterService parameterService;
 
     /**
      * spring启动后执行
-     *
      * @param contextRefreshedEvent
      */
     @Override
@@ -54,7 +61,6 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                 while (true) {
                     Socket client = serverSocket.accept();
                     System.out.println("------已连接------");
-                    new KeepThread(client);
                     new RecvThread(client, parameterService);
                 }
             } catch (IOException e) {
@@ -106,11 +112,15 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
             public void run() {
                 try {
                     InputStream inStr = socket.getInputStream();
+                    OutputStream outStr = socket.getOutputStream();
                     System.out.println("==============开始接收数据===============");
                     while (true) {
                         byte[] b = new byte[118];
                         int r = inStr.read(b);
-                        if (r > 58) {
+                        if (r == 12) {
+                            outStr.write(RESPONSE_PACKAGE);
+                            outStr.flush();
+                        } else if (r == 59) {
                             Matcher m = DEVICE_PATTERN.matcher(new String(b));
                             if (m.find()) {
 //                                System.out.println("设备:" + new String(b, m.start(), 8) + "  " + new Date());
@@ -142,39 +152,6 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                                 parameterService.insert(parameter);
                             }
                         }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
-        /**
-         * 10秒发一次心跳包
-         */
-        private static class KeepThread implements Runnable {
-
-            private Socket socket;
-
-            public KeepThread(Socket client) {
-                socket = client;
-                new Thread(this).start();
-            }
-
-            @Override
-            public void run() {
-                try {
-                    System.out.println("=====================开始发送心跳包==============");
-                    while (true) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        OutputStream outStr = socket.getOutputStream();
-                        outStr.write("send heart beat data package !".getBytes());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
