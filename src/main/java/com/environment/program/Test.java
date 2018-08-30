@@ -34,7 +34,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
      * 线程池
      */
     private static final ExecutorService THREAD_POOL = new ThreadPoolExecutor(10, 10,
-            1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(10));
+            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1024));
 
     @Autowired
     private ParameterService parameterService;
