@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Date;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,9 @@ import java.util.regex.Pattern;
 public class Test implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final int PORT = 8888;
+
+    @Autowired
+    private ParameterService parameterService;
 
     /**
      * 匹配设备ID，格式为ABC-1234
@@ -28,37 +33,38 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
     /**
      * 心跳应答包
      */
-    private static byte[] RESPONSE_PACKAGE = {(byte)0x55, (byte)0xAA , (byte)0x08, (byte)0x00, (byte)0x00, (byte)0x00};
+    private static byte[] RESPONSE_PACKAGE = {(byte) 0x55, (byte) 0xAA, (byte) 0x08, (byte) 0x00, (byte) 0x00, (byte) 0x00};
 
     /**
      * 线程池
      */
-    private static final ExecutorService THREAD_POOL = new ThreadPoolExecutor(10, 10,
-            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1024));
+    private static ExecutorService THREAD_POOL = new ThreadPoolExecutor(1, 100,
+            10, TimeUnit.MINUTES, new SynchronousQueue(),
+            new ThreadFactory() {
 
-    @Autowired
-    private ParameterService parameterService;
+                private final AtomicInteger mCount = new AtomicInteger(1);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "Socket_pool:" + mCount.getAndIncrement());
+                }
+            });
+
 
     /**
      * spring启动后执行
+     *
      * @param contextRefreshedEvent
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        THREAD_POOL.execute(new Connect(parameterService));
+        THREAD_POOL.execute(new Connect());
     }
 
     /**
      * 开启Socket
      */
-    private static class Connect implements Runnable {
-
-        private ParameterService parameterService;
-
-        public Connect(ParameterService parameterService) {
-            this.parameterService = parameterService;
-        }
-
+    private class Connect implements Runnable {
         @Override
         public void run() {
             try {
@@ -67,104 +73,92 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                 while (true) {
                     Socket client = serverSocket.accept();
                     System.out.println("------已连接------");
-                    THREAD_POOL.execute(new RecvThread(client, parameterService));
+                    THREAD_POOL.execute(new RecvThread(client));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
+    }
+
+    /**
+     * 接受消息
+     */
+    private class RecvThread implements Runnable {
+
+        private Socket socket;
+
+        public RecvThread(Socket client) {
+            socket = client;
+        }
 
         /**
-         * 接受消息
+         * 合并高低八位
+         *
+         * @param i
+         * @param j
+         * @return
          */
-         static class RecvThread implements Runnable {
+        private int change(byte i, byte j) {
+            return (i & 0xFF) * 256 + (j & 0xFF);
+        }
 
-            private Socket socket;
-
-            private ParameterService parameterService;
-
-            public RecvThread(Socket client, ParameterService parameterService) {
-                socket = client;
-                this.parameterService = parameterService;
-            }
-
-            /**
-             * 合并高低八位
-             * @param i
-             * @param j
-             * @return
-             */
-            private int change(byte i, byte j) {
-                return (i & 0xFF) * 256 + (j & 0xFF);
-            }
-
-            /**
-             * 将结果除以10
-             * @param value
-             * @return
-             */
-            private String result(int value){
-                if(value == 0){
-                    return String.valueOf(value);
-                }else{
-                    return String.valueOf(value * 1.0 / 10);
-                }
-            }
-
-
-            @Override
-            public void run() {
-                try {
-                    InputStream inStr = socket.getInputStream();
-                    OutputStream outStr = socket.getOutputStream();
-                    System.out.println("==============开始接收数据===============");
-                    while (true) {
-                        byte[] b = new byte[118];
-                        int r = inStr.read(b);
-                        if (r == 12) {
-                            outStr.write(RESPONSE_PACKAGE);
-                            outStr.flush();
-                        } else if (r == 59) {
-                            Matcher m = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
-                            if (m.find()) {
-//                                System.out.println("设备:" + new String(b, m.start(), 8) + "  " + new Date());
-//                                System.out.println("风速:" + String.valueOf(change(b[36], b[37]) * 1.0 / 10) + "，原始数据:" + (b[36] & 0xFF) + "  " + (b[37] & 0xFF));
-//                                System.out.println("风向:" + String.valueOf(change(b[38], b[39])) + "，原始数据:" + (b[38] & 0xFF) + "  " + (b[39] & 0xFF));
-//                                System.out.println("CO2:" + String.valueOf(change(b[40], b[41])) + "，原始数据:" + (b[40] & 0xFF) + "  " + (b[41] & 0xFF));
-//                                System.out.println("TVOC:" + String.valueOf(change(b[42], b[43]) * 1.0 / 10) + "，原始数据:" + (b[42] & 0xFF) + "  " + (b[43] & 0xFF));
-//                                System.out.println("甲醛:" + String.valueOf(change(b[44], b[45]) * 1.0 / 10) + "，原始数据:" + (b[44] & 0xFF) + "  " + (b[45] & 0xFF));
-//                                System.out.println("湿度:" + String.valueOf(b[46] & 0xFF) + "，原始数据:" + (b[46] & 0xFF));
-//                                System.out.println("温度:" + String.valueOf(change(b[47], b[48]) * 1.0 / 10) + "，原始数据:" + (b[47] & 0xFF) + "  " + (b[48] & 0xFF));
-//                                System.out.println("光照:" + String.valueOf(change(b[49], b[50])) + "，原始数据:" + (b[49] & 0xFF) + "  " + (b[50] & 0xFF));
-//                                System.out.println("PM1.0:" + String.valueOf(change(b[51], b[52])) + "，原始数据:" + (b[51] & 0xFF) + "  " + (b[52] & 0xFF));
-//                                System.out.println("PM2.5:" + String.valueOf(change(b[53], b[54])) + "，原始数据:" + (b[53] & 0xFF) + "  " + (b[54] & 0xFF));
-//                                System.out.println("PM10:" + String.valueOf(change(b[55], b[56])) + "，原始数据:" + (b[55] & 0xFF) + "  " + (b[56] & 0xFF));
-                                Parameter parameter = new Parameter();
-                                parameter.setDeviceId(new String(b, m.start(), 8, "UTF-8"));
-                                parameter.setWindSpeed(result(change(b[36], b[37])));
-                                parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
-                                parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
-                                parameter.setTvoc(result(change(b[42], b[43])));
-                                parameter.setHcho(result(change(b[44], b[45])));
-                                parameter.setHumidity(String.valueOf(b[46] & 0xFF));
-                                parameter.setTemperature(result(change(b[47], b[48])));
-                                parameter.setIllumination(String.valueOf(change(b[49], b[50])));
-                                parameter.setpMOnePointZero(String.valueOf(change(b[51], b[52])));
-                                parameter.setpMTwoPointFive(String.valueOf(change(b[53], b[54])));
-                                parameter.setpMTen(String.valueOf(change(b[55], b[56])));
-                                parameter.setCreateTime(new Date());
-                                parameterService.insert(parameter);
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+        /**
+         * 将结果除以10
+         *
+         * @param value
+         * @return
+         */
+        private String result(int value) {
+            if (value == 0) {
+                return String.valueOf(value);
+            } else {
+                return String.valueOf(value * 1.0 / 10);
             }
         }
 
+
+        @Override
+        public void run() {
+            try {
+                InputStream inStr = socket.getInputStream();
+                OutputStream outStr = socket.getOutputStream();
+                System.out.println("==============开始接收数据===============");
+                while (true) {
+                    byte[] b = new byte[118];
+                    int r = inStr.read(b);
+                    if (r == 12) {
+                        outStr.write(RESPONSE_PACKAGE);
+                        outStr.flush();
+                    } else if (r == 59) {
+                        Matcher m = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
+                        if (m.find()) {
+                            Parameter parameter = new Parameter();
+                            parameter.setDeviceId(new String(b, m.start(), 8, "UTF-8"));
+                            parameter.setWindSpeed(result(change(b[36], b[37])));
+                            parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
+                            parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
+                            parameter.setTvoc(result(change(b[42], b[43])));
+                            parameter.setHcho(result(change(b[44], b[45])));
+                            parameter.setHumidity(String.valueOf(b[46] & 0xFF));
+                            parameter.setTemperature(result(change(b[47], b[48])));
+                            parameter.setIllumination(String.valueOf(change(b[49], b[50])));
+                            parameter.setpMOnePointZero(String.valueOf(change(b[51], b[52])));
+                            parameter.setpMTwoPointFive(String.valueOf(change(b[53], b[54])));
+                            parameter.setpMTen(String.valueOf(change(b[55], b[56])));
+                            parameter.setCreateTime(new Date());
+                            parameterService.insert(parameter);
+                        }
+                    }
+                }
+            } catch (SocketException e) {
+                System.out.println("SocketException:" + e.getMessage());
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }
     }
 
 }
