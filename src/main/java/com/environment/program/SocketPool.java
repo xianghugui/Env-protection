@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class Test implements ApplicationListener<ContextRefreshedEvent> {
+public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final int PORT = 8888;
 
@@ -28,18 +28,18 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
     /**
      * 匹配设备ID，格式为ABC-1234
      */
-    private static Pattern DEVICE_PATTERN = Pattern.compile("[a-zA-Z]{3}[-]{1}\\d{4}");
+    private static final Pattern DEVICE_PATTERN = Pattern.compile("[a-zA-Z]{3}[-]{1}\\d{4}");
 
     /**
      * 心跳应答包
      */
-    private static byte[] RESPONSE_PACKAGE = {(byte) 0x55, (byte) 0xAA, (byte) 0x08, (byte) 0x00, (byte) 0x00, (byte) 0x00};
+    private static final byte[] RESPONSE_PACKAGE = {(byte) 0x55, (byte) 0xAA, (byte) 0x08, (byte) 0x00, (byte) 0x00, (byte) 0x00};
 
     /**
      * 线程池
      */
-    private static ExecutorService THREAD_POOL = new ThreadPoolExecutor(1, 100,
-            10, TimeUnit.MINUTES, new SynchronousQueue(),
+    private static final ExecutorService THREAD_POOL = new ThreadPoolExecutor(1, 100,
+            0, TimeUnit.MILLISECONDS, new SynchronousQueue(),
             new ThreadFactory() {
 
                 private final AtomicInteger mCount = new AtomicInteger(1);
@@ -128,10 +128,7 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                 while (true) {
                     byte[] b = new byte[118];
                     int r = inStr.read(b);
-                    if (r == 12) {
-                        outStr.write(RESPONSE_PACKAGE);
-                        outStr.flush();
-                    } else if (r == 59) {
+                    if (r == 59) {
                         Matcher m = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
                         if (m.find()) {
                             Parameter parameter = new Parameter();
@@ -150,11 +147,14 @@ public class Test implements ApplicationListener<ContextRefreshedEvent> {
                             parameter.setCreateTime(new Date());
                             parameterService.insert(parameter);
                         }
+                    } else {
+                        outStr.write(RESPONSE_PACKAGE);
+                        outStr.flush();
                     }
                 }
             } catch (SocketException e) {
                 System.out.println("SocketException:" + e.getMessage());
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
