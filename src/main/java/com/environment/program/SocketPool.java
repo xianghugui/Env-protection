@@ -121,18 +121,25 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
 
         @Override
         public void run() {
+            InputStream inStr = null;
+            OutputStream outStr = null;
+            int length;
+            byte[] b;
+            Matcher matcher;
+            Parameter parameter = new Parameter();
             try {
-                InputStream inStr = socket.getInputStream();
-                OutputStream outStr = socket.getOutputStream();
+                inStr = socket.getInputStream();
+                outStr = socket.getOutputStream();
                 System.out.println("==============开始接收数据===============");
                 while (true) {
-                    byte[] b = new byte[118];
-                    int r = inStr.read(b);
-                    if (r == 59) {
-                        Matcher m = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
-                        if (m.find()) {
-                            Parameter parameter = new Parameter();
-                            parameter.setDeviceId(new String(b, m.start(), 8, "UTF-8"));
+                    b = new byte[118];
+                    length = inStr.read(b);
+                    if (length <= 0){
+                        break;
+                    } else if (length == 59) {
+                        matcher = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
+                        if (matcher.find()) {
+                            parameter.setDeviceId(new String(b, matcher.start(), 8, "UTF-8"));
                             parameter.setWindSpeed(result(change(b[36], b[37])));
                             parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
                             parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
@@ -156,6 +163,28 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
                 System.out.println("SocketException:" + e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (inStr != null) {
+                    try {
+                        inStr.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (outStr != null) {
+                    try {
+                        outStr.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         }
