@@ -124,20 +124,16 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
             InputStream inStr = null;
             OutputStream outStr = null;
             int length;
-            byte[] b;
+            byte[] b = new byte[118];
             Matcher matcher;
             Parameter parameter = new Parameter();
             try {
                 inStr = socket.getInputStream();
                 outStr = socket.getOutputStream();
                 System.out.println("==============开始接收数据===============");
-                while (true) {
-                    b = new byte[118];
-                    length = inStr.read(b);
-                    if (length <= 0){
-                        break;
-                    } else if (length == 59) {
-                        matcher = DEVICE_PATTERN.matcher(new String(b, "UTF-8"));
+                while ((length = inStr.read(b)) > 0) {
+                    if (length == 59) {
+                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, "UTF-8"));
                         if (matcher.find()) {
                             parameter.setDeviceId(new String(b, matcher.start(), 8, "UTF-8"));
                             parameter.setWindSpeed(result(change(b[36], b[37])));
@@ -154,13 +150,16 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
                             parameter.setCreateTime(new Date());
                             parameterService.insert(parameter);
                         }
-                    } else {
-                        outStr.write(RESPONSE_PACKAGE);
-                        outStr.flush();
+                    } else if(length == 12) {
+                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, "UTF-8"));
+                        if (matcher.find()) {
+                            outStr.write(RESPONSE_PACKAGE);
+                            outStr.flush();
+                        }
                     }
                 }
             } catch (SocketException e) {
-                System.out.println("SocketException:" + e.getMessage());
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
