@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,9 +133,9 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
                 System.out.println("==============开始接收数据===============");
                 while ((length = inStr.read(b)) > 0) {
                     if (length == 59) {
-                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, "UTF-8"));
+                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, StandardCharsets.UTF_8));
                         if (matcher.find()) {
-                            parameter.setDeviceId(new String(b, matcher.start(), 8, "UTF-8"));
+                            parameter.setDeviceId(new String(b, matcher.start(), 8, StandardCharsets.UTF_8));
                             parameter.setWindSpeed(result(change(b[36], b[37])));
                             parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
                             parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
@@ -151,15 +151,13 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
                             parameterService.insert(parameter);
                         }
                     } else if(length == 12) {
-                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, "UTF-8"));
+                        matcher = DEVICE_PATTERN.matcher(new String(b, 0, length, StandardCharsets.UTF_8));
                         if (matcher.find()) {
                             outStr.write(RESPONSE_PACKAGE);
                             outStr.flush();
                         }
                     }
                 }
-            } catch (SocketException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
