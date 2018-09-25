@@ -39,4 +39,8 @@ public interface ParameterMapper {
 
     @Select("SELECT * FROM parameter WHERE deviceId = 'ZXW-0002' ORDER BY createTime DESC LIMIT 1")
     Parameter selectOne ();
+
+    @Select("SELECT * FROM parameter WHERE deviceId = #{deviceId} ORDER BY createTime DESC LIMIT 1")
+    Parameter select(String deviceId);
+
 }

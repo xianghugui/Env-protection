@@ -138,9 +138,9 @@ public class SocketPool implements ApplicationListener<ContextRefreshedEvent> {
                             parameter.setDeviceId(new String(b, matcher.start(), 8, StandardCharsets.UTF_8));
                             parameter.setWindSpeed(result(change(b[36], b[37])));
                             parameter.setWindDirection(String.valueOf(change(b[38], b[39])));
-                            parameter.setCoTwo(String.valueOf(change(b[40], b[41])));
-                            parameter.setTvoc(result(change(b[42], b[43])));
-                            parameter.setHcho(result(change(b[44], b[45])));
+                            parameter.setCoTwo(String.valueOf(change(b[40], b[41]) / 10000));
+                            parameter.setTvoc(String.valueOf(change(b[42], b[43]) / 1000 * 833));
+                            parameter.setHcho(String.valueOf(change(b[44], b[45]) /1000 * 833));
                             parameter.setHumidity(String.valueOf(b[46] & 0xFF));
                             parameter.setTemperature(result(change(b[47], b[48])));
                             parameter.setIllumination(String.valueOf(change(b[49], b[50])));

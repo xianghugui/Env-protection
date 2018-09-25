@@ -9,4 +9,6 @@ public interface ParameterService {
     Integer update(Parameter parameter);
 
     Parameter selectOne ();
+
+    Parameter select(String deviceId);
 }

@@ -43,4 +43,9 @@ public class ParameterController {
     public ResponseMessage selectOne() {
         return ResponseMessage.ok(parameterService.selectOne());
     }
+
+    @GetMapping ("/{deviceId}")
+    public ResponseMessage select(@PathVariable("deviceId") String deviceId) {
+        return ResponseMessage.ok(parameterService.select(deviceId));
+    }
 }
